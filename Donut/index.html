@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ร้านโดนัทแสนอร่อย</title>
+  <style>
+    /* 2. จัดสไตล์ UI แบบ Mobile-First ล็อกความกว้างกึ่งกลาง */
+    body {
+      font-family: 'Sukhumvit Set', 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 500px; /* ล็อกความกว้างไม่ให้แผ่กว้างเกินไปในคอม */
+      background-color: #ffffff;
+      min-height: 100vh;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding-bottom: 90px; /* เว้นที่ด้านล่างไว้ไม่ให้ปุ่มลอยทับเมนู */
+    }
+
+    /* Header ร้าน */
+    .header {
+      background-color: #ff6b81;
+      color: white;
+      text-align: center;
+      padding: 20px 15px;
+      border-radius: 0 0 20px 20px;
+    }
+    .header h1 { margin: 0; font-size: 22px; }
+    .header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+
+    /* รายการเมนูโดนัท */
+    .menu-list { padding: 15px; }
+    
+    .donut-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+
+    .donut-info h3 { margin: 0 0 5px; font-size: 16px; color: #333; }
+    .donut-info p { margin: 0; color: #ff6b81; font-weight: bold; }
+
+    /* ปุ่ม บวก-ลบ จำนวน */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-qty {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background-color: #f1f2f6;
+      color: #333;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-qty:active { background-color: #e4e5e9; }
+    .qty-count { font-weight: bold; min-width: 20px; text-align: center; }
+
+    /* 3. Sticky Bottom Button ปุ่มสั่งซื้อลอยค้างด้านล่าง */
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 500px;
+      background: white;
+      border-top: 1px solid #eee;
+      padding: 12px 20px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .total-price { font-size: 18px; font-weight: bold; color: #333; }
+    .btn-order {
+      background-color: #2ed573;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+    }
+    .btn-order:disabled { background-color: #ccc; box-shadow: none; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="header">
+      <h1>🍩 Donut Sweet Shop</h1>
+      <p>เลือกหน้าโดนัทที่ชอบ แล้วกดสั่งได้เลย!</p>
+    </div>
+
+    <div class="menu-list">
+      
+      <div class="donut-card">
+        <div class="donut-info">
+          <h3>1. ช็อกโกแลตฟัดจ์</h3>
+          <p>25 บาท</p>
+        </div>
+        <div class="qty-control">
+          <button class="btn-qty" onclick="changeQty('chocolate', -1, 25)">-</button>
+          <span class="qty-count" id="qty-chocolate">0</span>
+          <button class="btn-qty" onclick="changeQty('chocolate', 1, 25)">+</button>
+        </div>
+      </div>
+
+      <div class="donut-card">
+        <div class="donut-info">
+          <h3>2. สตรอว์เบอร์รีพรีเมียม</h3>
+          <p>25 บาท</p>
+        </div>
+        <div class="qty-control">
+          <button class="btn-qty" onclick="changeQty('strawberry', -1, 25)">-</button>
+          <span class="qty-count" id="qty-strawberry">0</span>
+          <button class="btn-qty" onclick="changeQty('strawberry', 1, 25)">+</button>
+        </div>
+      </div>
+
+      <div class="donut-card">
+        <div class="donut-info">
+          <h3>3. มัทฉะชาเขียว</h3>
+          <p>30 บาท</p>
+        </div>
+        <div class="qty-control">
+          <button class="btn-qty" onclick="changeQty('matcha', -1, 30)">-</button>
+          <span class="qty-count" id="qty-matcha">0</span>
+          <button class="btn-qty" onclick="changeQty('matcha', 1, 30)">+</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-bar">
+      <div class="total-price">ราคารวม: <span id="grand-total">0</span> บาท</div>
+      <button class="btn-order" id="order-btn" onclick="sendOrder()" disabled>ส่งออเดอร์</button>
+    </div>
+  </div>
+
+  <script>
+    // เก็บจำนวนของแต่ละเมนู
+    const cart = {
+      chocolate: { name: 'ช็อกโกแลตฟัดจ์', qty: 0, price: 25 },
+      strawberry: { name: 'สตรอว์เบอร์รีพรีเมียม', qty: 0, price: 25 },
+      matcha: { name: 'มัทฉะชาเขียว', qty: 0, price: 30 }
+    };
+
+    let grandTotal = 0;
+
+    // ฟังก์ชันเพิ่ม-ลด จำนวนสินค้า
+    function changeQty(itemKey, delta, price) {
+      if (cart[itemKey].qty + delta >= 0) {
+        cart[itemKey].qty += delta;
+        document.getElementById(`qty-${itemKey}`).innerText = cart[itemKey].qty;
+        updateTotal();
+      }
+    }
+
+    // ฟังก์ชันคำนวณราคารวมทั้งหมด
+    function updateTotal() {
+      grandTotal = 0;
+      let totalItems = 0;
+      
+      for (let key in cart) {
+        grandTotal += cart[key].qty * cart[key].price;
+        totalItems += cart[key].qty;
+      }
+
+      document.getElementById('grand-total').innerText = grandTotal;
+      
+      // ปลดล็อกปุ่มถ้าเลือกสินค้ามากกว่า 0 ชิ้น
+      const orderBtn = document.getElementById('order-btn');
+      orderBtn.disabled = totalItems === 0;
+    }
+
+    // ฟังก์ชันส่งออเดอร์ไปยังหน้าเว็บรับข้อมูล
+    function sendOrder() {
+      const orderItems = Object.entries(cart)
+        .filter(([, item]) => item.qty > 0)
+        .map(([key, item]) => ({
+          name: item.name,
+          qty: item.qty,
+          price: item.price
+        }));
+
+      const params = new URLSearchParams({
+        orderItems: JSON.stringify(orderItems),
+        total: grandTotal.toString()
+      });
+
+      window.location.href = `order-receipt.html?${params.toString()}`;
+    }
+  </script>
+</body>
+</html>
