@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สั่งซื้อโดนัท - Donut Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: #ffffff;
+            min-height: 100vh;
+            padding-bottom: 110px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        .header {
+            background: linear-gradient(135deg, #ff8a00, #e52e71);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        .customer-info {
+            padding: 15px 20px 5px 20px;
+        }
+        .customer-info label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .customer-info input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+        .customer-info input:focus {
+            border-color: #e52e71;
+        }
+        .menu-list {
+            padding: 15px;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid #f0f0f0;
+            border-radius: 15px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .menu-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            background-color: #ffe6e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-right: 12px;
+        }
+        .menu-info {
+            flex: 1;
+        }
+        .menu-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .menu-price {
+            font-size: 13px;
+            color: #e52e71;
+            font-weight: 600;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-qty {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background-color: #f0f0f0;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .qty-number {
+            font-size: 15px;
+            font-weight: 600;
+            width: 20px;
+            text-align: center;
+        }
+        .footer-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            padding: 15px 20px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+        .total-price {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .total-price span {
+            color: #e52e71;
+            font-size: 20px;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #ff8a00, #e52e71);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: white;
+            width: 85%;
+            max-width: 360px;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+        }
+        .modal-content h2 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        .btn-close {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>🍩 ร้านโดนัทแสนอร่อย</h1>
+        <p>เลือกหน้าโดนัทแล้วกรอกชื่อกดสั่งได้เลย!</p>
+    </div>
+
+    <div class="customer-info">
+        <label for="customerName">ชื่อผู้สั่งซื้อ / ชื่อเล่น:</label>
+        <input type="text" id="customerName" placeholder="กรอกชื่อของคุณที่นี่...">
+    </div>
+
+    <div class="menu-list" id="menu-list"></div>
+
+    <div class="footer-bar">
+        <div class="total-price">ราคารวม: <br><span id="total-amount">0</span> บาท</div>
+        <button class="btn-submit" onclick="submitOrder()">ส่งออเดอร์ 🚀</button>
+    </div>
+</div>
+
+<div class="modal" id="orderModal">
+    <div class="modal-content">
+        <h2>🎉 สั่งซื้อสำเร็จ!</h2>
+        <p id="orderModalMessage">คำสั่งซื้อของคุณถูกส่งไปยังร้านแล้ว</p>
+        <button class="btn-close" onclick="closeModal()">ตกลง</button>
+    </div>
+</div>
+
+<script>
+    const storageKey = 'donut_orders';
+
+    const donuts = [
+        { id: 1, name: "ช็อกโกแลตฟัดจ์", price: 29, icon: "🍫", qty: 0 },
+        { id: 2, name: "สตรอว์เบอร์รีพิงก์", price: 29, icon: "🍓", qty: 0 },
+        { id: 3, name: "วนิลาสปริงเคิล", price: 25, icon: "🧁", qty: 0 },
+        { id: 4, name: "ชาเขียวมัทฉะ", price: 32, icon: "🍵", qty: 0 },
+        { id: 5, name: "คาราเมลอัลมอนด์", price: 35, icon: "🥜", qty: 0 },
+        { id: 6, name: "ออริจินัล เกลซ", price: 20, icon: "🍯", qty: 0 }
+    ];
+
+    function renderMenu() {
+        const listContainer = document.getElementById('menu-list');
+        listContainer.innerHTML = '';
+        donuts.forEach((item, index) => {
+            listContainer.innerHTML += `
+                <div class="menu-item">
+                    <div class="menu-img">${item.icon}</div>
+                    <div class="menu-info">
+                        <div class="menu-title">${item.name}</div>
+                        <div class="menu-price">${item.price} บาท</div>
+                    </div>
+                    <div class="quantity-control">
+                        <button class="btn-qty" onclick="updateQty(${index}, -1)">-</button>
+                        <span class="qty-number">${item.qty}</span>
+                        <button class="btn-qty" onclick="updateQty(${index}, 1)">+</button>
+                    </div>
+                </div>
+            `;
+        });
+        calculateTotal();
+    }
+
+    function updateQty(index, change) {
+        if (donuts[index].qty + change >= 0) {
+            donuts[index].qty += change;
+            renderMenu();
+        }
+    }
+
+    function calculateTotal() {
+        const total = donuts.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        document.getElementById('total-amount').innerText = total;
+    }
+
+    function submitOrder() {
+        const nameInput = document.getElementById('customerName').value.trim();
+        const selectedDonuts = donuts.filter(item => item.qty > 0);
+
+        if (!nameInput) {
+            alert("กรุณากรอกชื่อของคุณก่อนกดสั่งซื้อครับ!");
+            return;
+        }
+
+        if (selectedDonuts.length === 0) {
+            alert("กรุณาเลือกโดนัทอย่างน้อย 1 ชิ้นครับ!");
+            return;
+        }
+
+        const orderData = {
+            customerName: nameInput,
+            items: selectedDonuts.map(item => ({
+                name: item.name,
+                qty: item.qty
+            })),
+            time: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        const savedOrders = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        savedOrders.unshift(orderData);
+        localStorage.setItem(storageKey, JSON.stringify(savedOrders));
+
+        document.getElementById('orderModalMessage').innerText =
+            `สั่งซื้อสำเร็จแล้ว คุณ ${orderData.customerName} คำสั่งซื้อของคุณถูกส่งไปยังร้านเรียบร้อยแล้ว`;
+        document.getElementById('orderModal').style.display = 'flex';
+
+        donuts.forEach(item => item.qty = 0);
+        document.getElementById('customerName').value = '';
+        renderMenu();
+    }
+
+    function closeModal() {
+        document.getElementById('orderModal').style.display = 'none';
+    }
+
+    renderMenu();
+</script>
+
+</body>
+</html>
